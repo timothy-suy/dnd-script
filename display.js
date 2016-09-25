@@ -1,3 +1,19 @@
+function getDisplaySettings(force = false) {
+	if ((typeof window.displaySettings == 'undefined') || force) {
+		window.displaySettings = {
+			width: 40,
+			height: 20,
+			square: {
+				width: 76,
+				height: 76,
+			},
+		};
+	}
+	return window.displaySettings;
+}
+
+//alles hieronder old & to be refactored
+
 //pre-loads all images, only executes callbacks when all are loaded (in correct order)
 
 function loadImages(sources, callback) {
