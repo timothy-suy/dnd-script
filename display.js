@@ -30,7 +30,7 @@ function render(canvas, shape, settings) {
 	var fill = false;
 	//apply settings
 	if (settings.hasOwnProperty('strokeStyle')) {
-		context.strokeStyle = settings.strokeStyle;
+		context.strokeStyle = window.globals.strokeStyle;
 		stroke = true;
 	}
 	if (settings.hasOwnProperty('fillStyle')) {
@@ -67,182 +67,38 @@ function render(canvas, shape, settings) {
 	return;
 }
 
-function renderGrid(canvas, globals)
+function renderGrid(canvas)
 {
 	var grid = [];
 
-	var settings = {};
-	settings.squares = 	{
-							x: Math.floor(globals.viewport.x / globals.pixelsPerInch.x * globals.qualityModifier.x),
-							y: Math.floor(globals.viewport.y / globals.pixelsPerInch.y * globals.qualityModifier.y),
-						};
-	settings.offset = 	{
-							x1: 	Math.floor((globals.viewport.x * globals.qualityModifier.x - (settings.squares.x * globals.pixelsPerInch.x)) / 2),
-							y1: 	Math.floor((globals.viewport.y * globals.qualityModifier.y - (settings.squares.y * globals.pixelsPerInch.y)) / 2),
-						};
-	for (X = 0; X <= settings.squares.x; X++)
+	for (X = 0; X <= (window.globals.squares.x + 1) * window.globals.qualityModifier.x; X = X + (1 * window.globals.qualityModifier.x))
 	{
 		grid.push({
 				type: 'move', 
-				x: Math.floor((settings.offset.x1 + (X * globals.pixelsPerInch.x))),
-				y: Math.floor((settings.offset.y1)),
+				x: Math.floor(X * window.globals.pixelsPerInch.x),
+				y: 0,
 			});
 		grid.push({
 				type: 'line',
-				x: Math.floor((settings.offset.x1 + (X * globals.pixelsPerInch.x))),
-				y: Math.floor((settings.offset.y1 + (settings.squares.y * globals.pixelsPerInch.y))),
+				x: Math.floor(X * window.globals.pixelsPerInch.x),
+				y: Math.floor((window.globals.squares.y * window.globals.qualityModifier.y+2) * window.globals.pixelsPerInch.y),
 			});
 	}
 	
-	for (Y = 0; Y <= settings.squares.y; Y++)
+	for (Y = 0; Y <= (window.globals.squares.y + 1) * window.globals.qualityModifier.y; Y = Y + (1 * window.globals.qualityModifier.y))
 	{
 		grid.push({
 				type: 'move', 
-				x: Math.floor((settings.offset.x1)),
-				y: Math.floor((settings.offset.y1 + (Y * globals.pixelsPerInch.y))),
+				x: 0,
+				y: Math.floor(Y * window.globals.pixelsPerInch.y),
 			});
 		grid.push({
 				type: 'line',
-				x: Math.floor((settings.offset.x1 + (settings.squares.x * globals.pixelsPerInch.x))),
-				y: Math.floor((settings.offset.y1 + (Y * globals.pixelsPerInch.y))),
+				x: Math.floor((window.globals.squares.x * window.globals.qualityModifier.x+2) * window.globals.pixelsPerInch.x),
+				y: Math.floor(Y * window.globals.pixelsPerInch.y),
 			});
 	}
-
-	settings.offset.x2 = Math.floor((settings.offset.x1 + ((X-1) * globals.pixelsPerInch.x)));
-	settings.offset.y2 = Math.floor((settings.offset.y1 + ((Y-1) * globals.pixelsPerInch.y)));
-	
-	render(canvas, grid, $.extend({}, {strokeStyle: "rgba(0, 0, 0, 0.75)", lineWidth: 1} , settings));
-	
-	return settings;
-	//heel vuil, moet aprt bewerken of ophalen via API
-}
-
-function renderBorder(canvas, setttings)
-{
-	//border
-	var context = canvas.getContext("2d");
-
-	context.save(); 
-	context.beginPath();
-	context.moveTo(0, settings.offset.y1);
-	context.lineTo(settings.offset.x1, settings.offset.y1);
-	context.lineTo(settings.offset.x1, settings.offset.y2);
-	context.lineTo(0, settings.offset.y2);
-	context.closePath();
-	var gradient = context.createLinearGradient(0, 0, settings.offset.x1, 0);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.beginPath();
-	context.moveTo(settings.offset.x1, 0);
-	context.lineTo(settings.offset.x1, settings.offset.y1);
-	context.lineTo(settings.offset.x2, settings.offset.y1);
-	context.lineTo(settings.offset.x2, 0);
-	context.closePath();
-	var gradient = context.createLinearGradient(0, 0, 0, settings.offset.y1);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.beginPath();
-	context.moveTo(settings.offset.x1, settings.offset.y2);
-	context.lineTo(settings.offset.x1, settings.globals.viewport.y * settings.globals.qualityModifier.y);
-	context.lineTo(settings.offset.x2, settings.globals.viewport.y * settings.globals.qualityModifier.y);
-	context.lineTo(settings.offset.x2, settings.offset.y2);
-	context.closePath();
-	var gradient = context.createLinearGradient(0, settings.globals.viewport.y * settings.globals.qualityModifier.y, 0, settings.offset.y2);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.beginPath();
-	context.moveTo(settings.offset.x2, settings.offset.y1);
-	context.lineTo(settings.globals.viewport.x * settings.globals.qualityModifier.x, settings.offset.y1);
-	context.lineTo(settings.globals.viewport.x * settings.globals.qualityModifier.x, settings.offset.y2);
-	context.lineTo(settings.offset.x2, settings.offset.y2);
-	context.closePath();
-	var gradient = context.createLinearGradient(settings.globals.viewport.x * settings.globals.qualityModifier.x, settings.globals.viewport.y * settings.globals.qualityModifier.y, settings.offset.x2, settings.globals.viewport.y * settings.globals.qualityModifier.y);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.scale(settings.offset.x1/100, settings.offset.y1/100); 
-	context.beginPath();
-	context.moveTo(0, 0);
-	context.lineTo(100, 0);
-	context.lineTo(100, 100);
-	context.lineTo(0, 100);
-	context.closePath();
-    var gradient = context.createRadialGradient(100, 100, 100, 100, 100, 0);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.translate(settings.offset.x1 + settings.offset.x2, 0);
-	context.scale(settings.offset.x1/100, settings.offset.y1/100); 
-	context.rotate(2 * Math.PI / 360 * 90); 
-	context.beginPath();
-	context.moveTo(0, 0);
-	context.lineTo(100, 0);
-	context.lineTo(100, 100);
-	context.lineTo(0, 100);
-	context.closePath();
-    var gradient = context.createRadialGradient(100, 100, 100, 100, 100, 0);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.translate(settings.offset.x1 + settings.offset.x2, settings.offset.y1 + settings.offset.y2);
-	context.scale(settings.offset.x1/100, settings.offset.y1/100); 
-	context.rotate(2 * Math.PI / 360 * 180); 
-	context.beginPath();
-	context.moveTo(0, 0);
-	context.lineTo(100, 0);
-	context.lineTo(100, 100);
-	context.lineTo(0, 100);
-	context.closePath();
-    var gradient = context.createRadialGradient(100, 100, 100, 100, 100, 0);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
-
-	context.save(); 
-	context.translate(0, settings.offset.y1 + settings.offset.y2);
-	context.scale(settings.offset.x1/100, settings.offset.y1/100); 
-	context.rotate(2 * Math.PI / 360 * 270); 
-	context.beginPath();
-	context.moveTo(0, 0);
-	context.lineTo(100, 0);
-	context.lineTo(100, 100);
-	context.lineTo(0, 100);
-	context.closePath();
-    var gradient = context.createRadialGradient(100, 100, 100, 100, 100, 0);
-	gradient.addColorStop(0, "rgba(0, 0, 0, 1)");   
-	gradient.addColorStop(1, "rgba(0, 0, 0, 0)");   
-	context.fillStyle = gradient;
-	context.fill();
-	context.restore(); 
+	render(canvas, grid, $.extend({}, {strokeStyle: "rgba(0, 0, 0, 0.75)", lineWidth: 1}));
 }
 
 function renderNumbers(canvas)
@@ -251,22 +107,65 @@ function renderNumbers(canvas)
 	context.font = 'italic 24pt Calibri';
 	context.textAlign = 'center';
 	context.fillStyle = 'rgba(0, 0, 0, 1)';
-	for (var squareNumber = 0; squareNumber < (settings.squares.x * globals.sizeModifier.x * settings.squares.y * globals.sizeModifier.y); squareNumber++)
+	for (var squareNumber = 0; squareNumber < (window.globals.squares.x * window.globals.squares.y); squareNumber++)
 	{
-		var x = settings.offset.x1 + (((squareNumber % (settings.squares.x * globals.sizeModifier.x))+ 0.5) * globals.pixelsPerInch.x);
-		var y = settings.offset.y1 + ((Math.floor(squareNumber / (settings.squares.x * globals.sizeModifier.x)) + 0.5) * globals.pixelsPerInch.y) + 12;	//12 = +- helft hoogte font
+		var x = (((squareNumber % (window.globals.squares.x))+ 0.5) * window.globals.pixelsPerInch.x * window.globals.qualityModifier.x);
+		var y = ((Math.floor(squareNumber / (window.globals.squares.x)) + 0.5) * window.globals.pixelsPerInch.y * window.globals.qualityModifier.y) + 12;
 		context.fillText(squareNumber, x, y);
 	}
 }
 
-//gamestate-related functions
-function setPositionX(val) {
-	state.position.x = Math.max(Math.min(0, val), (-1 * settings.squares.x * (globals.sizeModifier.x-1)));
-	$('#background').css('left', state.position.x * globals.pixelsPerInch.x / globals.qualityModifier.x);
+//viewport-related functions
+function moveViewPort(x, y) {
+	setViewPort(parseInt(window.state.position.x) + x, parseInt(window.state.position.y) + y);
 }
 
-function setPositionY(val) {
-	state.position.y = Math.max(Math.min(0, val), (-1 * settings.squares.y * (globals.sizeModifier.y-1)));
-	$('#background').css('top', state.position.y * globals.pixelsPerInch.y / globals.qualityModifier.y);
+function setViewPort(x, y) {
+	grid = getGridDimensions();
+	viewport = getViewportGridDimensions();
+
+	window.state.position.x = Math.min(Math.max(0, x), grid.x - viewport.x - 1);
+	window.state.position.y = Math.min(Math.max(0, y), grid.y - viewport.y - 1);
+
+	$('.resizable').css('left', Math.floor(-1 * window.state.position.x * (window.globals.pixelsPerInch.x) / (window.globals.qualityModifier.x)));
+	$('.resizable').css('top' , Math.floor(-1 * window.state.position.y * (window.globals.pixelsPerInch.y) / (window.globals.qualityModifier.y)));
+
+	console.log('asked to set to viewport to (' + x + ', ' + y + '); setting to (' + window.state.position.x + ', ' + window.state.position.y + ')');
 }
 
+function zoomFullscreen() {
+	$('.resizable').css('left', 0);
+	$('.resizable').css('top', 0);
+	$('.resizable').css('width', window.globals.viewport.x);
+	$('.resizable').css('height', window.globals.viewport.y);
+	window.state.stored_position.x = window.state.position.x;
+	window.state.stored_position.y = window.state.position.y;
+	window.state.position.x = 0;
+	window.state.position.y = 0;
+}
+
+function zoomReal() {
+	window.state.position.x = window.state.stored_position.x;
+	window.state.position.y = window.state.stored_position.y;
+	$('.resizable').css('left', window.state.position.x * window.globals.pixelsPerInch.x / window.globals.qualityModifier.x);
+	$('.resizable').css('top', window.state.position.y * window.globals.pixelsPerInch.y / window.globals.qualityModifier.y);
+	$('.resizable').css('width', window.globals.viewport.x * window.globals.qualityModifier.x);
+	$('.resizable').css('height', window.globals.viewport.y * window.globals.qualityModifier.y);
+					
+	console.log(getGridDimensions());
+	console.log(getViewportGridDimensions());
+}
+
+function getGridDimensions() {
+	return {
+		x: window.globals.squares.x + 1,
+		y: window.globals.squares.y + 1
+	};
+}
+
+function getViewportGridDimensions() {
+	return {
+		x: Math.floor(parseInt($('#grid').css('width')) / window.globals.pixelsPerInch.x * window.globals.qualityModifier.x),
+		y: Math.floor(parseInt($('#grid').css('height')) / window.globals.pixelsPerInch.y * window.globals.qualityModifier.y)
+	};
+}
