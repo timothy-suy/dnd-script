@@ -1,4 +1,5 @@
 function handleInstruction(type, data) {
+	console.log('received instruction of type ' + type);
 	switch (type) {
 		case 'moveViewport':
 			moveViewPort(parseInt(data.value.x), parseInt(data.value.y));
