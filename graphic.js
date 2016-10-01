@@ -17,8 +17,8 @@ Graphic.prototype.addObject = function(object) {
 	this.objects.push(object);
 };
 
-Graphic.prototype.render = function(canvas) {
-	var context = canvas.getContext("2d");
+Graphic.prototype.render = function(layer) {
+	var context = layer.getContext("2d");
 	context.save();
 	//TODO: transformation
 	this.objects.forEach(function (object) {

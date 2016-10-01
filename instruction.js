@@ -1,36 +1,41 @@
-function handleInstruction(type, data) {
-	switch (type) {
+var Instruction = function (type, data) {
+	this.type = type;
+	this.data = data;
+}
+
+Instruction.prototype.handle = function() {
+	switch (this.type) {
 		case 'moveViewport':
-			window.game.setViewport(new Viewport(
-				window.game.viewport.id, 
-				window.game.viewport.name, 
-				Math.min(Math.max(0, window.game.viewport.top  + (data.value.y)), parseInt(window.game.map.height - window.game.viewport.height)), 
-				Math.min(Math.max(0, window.game.viewport.left + (data.value.x)), parseInt(window.game.map.width  - window.game.viewport.width )), 
-				window.game.viewport.width, 
-				window.game.viewport.height
+			window.state.setCurrentViewport(new Viewport(
+				window.state.viewport.id, 
+				window.state.viewport.name, 
+				Math.min(Math.max(0, window.state.viewport.top  + (this.data.value.y)), parseInt(window.state.map.height - window.state.viewport.height)), 
+				Math.min(Math.max(0, window.state.viewport.left + (this.data.value.x)), parseInt(window.state.map.width  - window.state.viewport.width )), 
+				window.state.viewport.width, 
+				window.state.viewport.height
 			));
 			break;
 		case 'zoom':
-			switch(data.value) {
+			switch(this.data.value) {
 				case 'fullscreen':
-					window.game.setViewport(new Viewport(
-						window.game.viewport.id, 
-						window.game.viewport.name, 
+					window.state.setCurrentViewport(new Viewport(
+						window.state.viewport.id, 
+						window.state.viewport.name, 
 						0, 
 						0, 
-						window.game.map.width, 
-						window.game.map.height
+						window.state.map.width, 
+						window.state.map.height
 					));
 					break;
 				case 'real':
 					//TODO: remember old position
-					window.game.setViewport(new Viewport(
-						window.game.viewport.id, 
-						window.game.viewport.name, 
+					window.state.setCurrentViewport(new Viewport(
+						window.state.viewport.id, 
+						window.state.viewport.name, 
 						0, 
 						0, 
-						window.game.displaySetting.width, 
-						window.game.displaySetting.height
+						window.state.displaySetting.width, 
+						window.state.displaySetting.height
 					));
 					break;
 			}

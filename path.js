@@ -1,23 +1,23 @@
-var Object = function (id, name, settings = null, drawables = []) {
+var Path = function (id, name, settings = null, pathParts = []) {
 	this.id = id;
 	this.name = name;
-	this.drawables = drawables;
+	this.pathParts = pathParts;
 	this.settings = settings;
 }
 
-Object.prototype.setDrawables = function(drawables) {
-	this.drawables = drawables;
+Path.prototype.setPathParts = function(pathParts) {
+	this.pathParts = pathParts;
 };
 
-Object.prototype.addDrawable = function(drawable) {
-	this.drawables.push(drawable);
+Path.prototype.addPathPart = function(pathPart) {
+	this.pathParts.push(pathPart);
 };
 
-Object.prototype.setSettings = function(settings) {
+Path.prototype.setSettings = function(settings) {
 	this.settings = settings;
 };
 
-Object.prototype.render = function(context) {
+Path.prototype.render = function(context) {
 	if (this.settings.strokeStyle != null) {
 		context.strokeStyle = this.settings.strokeStyle;
 	}
@@ -30,12 +30,12 @@ Object.prototype.render = function(context) {
 	// ... TODO
 
 	context.beginPath();
-	this.drawables.forEach(function (drawable) {
-		if (drawable.type == 'move') {
-			context.moveTo(drawable.x, drawable.y);
+	this.pathParts.forEach(function (pathPart) {
+		if (pathPart.type == 'move') {
+			context.moveTo(pathPart.x, pathPart.y);
 		}
-		if (drawable.type == 'line') {
-			context.lineTo(drawable.x, drawable.y);
+		if (pathPart.type == 'line') {
+			context.lineTo(pathPart.x, pathPart.y);
 		}
 		// ... TODO
 	});
