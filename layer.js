@@ -1,47 +1,30 @@
-function getLayers(mapId) {
-	return [
-		{id: 1},
-		{id: 2},
-		{id: 3},
-	];
+var Layer = function (id, name, zIndex, graphics = []) {
+	this.id = id;
+	this.name = name;
+	this.zIndex = zIndex;
+	this.graphics = graphics;
 }
 
-function getLayer(id, force = false) {
-	if ((typeof window.layers == 'undefined')) {
-		window.layers = [];
-	}
-	if ((typeof window.layers[id] == 'undefined') || force) {
-		window.layers[1] = {
-			id: 1,
-			name: 'floor',
-			data: {}, //TODO
-			zIndex: 100,
-		};
-		window.layers[2] = {
-			id: 2,
-			name: 'items',
-			data: {}, //TODO
-			zIndex: 200,
-		};
-		window.layers[3] = {
-			id: 3,
-			name: 'grid',
-			data: {}, //TODO
-			zIndex: 100,
-		};
-	}
-	return window.layers[id]
-}
+Layer.prototype.setGraphics = function(graphics) {
+	this.graphics = graphics;
+};
 
-function renderLayer(layer) {
-	game = getGame();
+Layer.prototype.addGraphic = function(graphic) {
+	this.graphics.push(graphic);
+};
+
+Layer.prototype.render = function (map, viewport, displaySetting) {
+	if (document.contains(document.getElementById('layer_'+this.name))) {
+		document.getElementById('layer_'+this.name).remove();
+	} 
 
 	var wrapperNode = document.createElement("DIV");
 	wrapperNode.className = 'canvas_wrapper';
+	wrapperNode.style.zIndex   = (this.zIndex);
 
 	var canvasNode = document.createElement("CANVAS");
-	canvasNode.id = layer.name;
-	canvasNode.className = 'layer';
+	canvasNode.id = 'layer_'+this.name;
+	canvasNode.classList.add('layer');
 	
 	wrapperNode.appendChild(canvasNode);
 	$('#content').append(wrapperNode);
@@ -49,8 +32,17 @@ function renderLayer(layer) {
 	canvasNode.setAttributeNode(document.createAttribute("width"));
 	canvasNode.setAttributeNode(document.createAttribute("height"));
 	
+	canvasNode.width 		  = map.width  * displaySetting.square.width;
+	canvasNode.height 		  = map.height * displaySetting.square.height;
+
 	canvasNode.style.position = 'absolute';
-	canvasNode.style.width = (game.map.width * game.displaySetting.square.width)+'px';
-	canvasNode.style.height = (game.map.height * game.displaySetting.square.height)+'px';
-	canvasNode.style.zIndex = (layer.zIndex);
-}
+	canvasNode.style.width    = 1280 * map.width / viewport.width;
+	canvasNode.style.height	  = 720 * map.height / viewport.height;
+	canvasNode.style.top 	  = viewport.top;
+	canvasNode.style.left 	  = viewport.left;
+	canvasNode.style.zIndex   = (this.zIndex);
+	
+	this.graphics.forEach(function (graphic) {
+		graphic.render(canvasNode);
+	});
+};

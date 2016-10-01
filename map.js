@@ -1,32 +1,21 @@
-function getMaps() {
-	return [
-		{id: 1},
-	];
+var Map = function (id, name, width, height, layers = []) {
+	this.id = id;
+	this.name = name;
+	this.width = width;
+	this.height = height;
+	this.layers = layers;
 }
 
-function getMap(id, force = false) {
-	if ((typeof window.maps == 'undefined')) {
-		window.maps = [];
-	}
-	if ((typeof window.maps[id] == 'undefined') || force) {
-		window.maps[1] = {
-			id: 1,
-			name: 'map'+id,
-			width: 80,
-			height: 40,
-			layers: [
-				{id: 1},
-				{id: 2},
-				{id: 2},
-			]
-		};
-	}
-	return window.maps[id]
-}
+Map.prototype.setLayers = function(layers) {
+	this.layers = layers;
+};
 
-function renderMap(map) {
-	const layers = getLayers(map.id)
-	for (var i in layers) {
-		renderLayer(getLayer(layers[i].id));
-	}
-}
+Map.prototype.addLayer = function(layer) {
+	this.layers.push(layer);
+};
+
+Map.prototype.render = function (game) {
+	this.layers.forEach(function (layer) {
+		layer.render(game.map, game.viewport, game.displaySetting);
+	});
+};
