@@ -17,6 +17,7 @@ Instruction.prototype.handle = function() {
 			break;
 		case 'zoom':
 			switch(this.data.value) {
+				//TODO: get viewport by name instead of creating an new one
 				case 'fullscreen':
 					window.state.setCurrentViewport(new Viewport(
 						window.state.viewport.id, 

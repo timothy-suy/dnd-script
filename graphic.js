@@ -1,12 +1,16 @@
-var Graphic = function (id, name, transformation = null, objects = []) {
+var Graphic = function (id, name, transformations = [], objects = []) {
 	this.id = id;
 	this.name = name;
-	this.transformation = transformation;
+	this.transformations = transformations;
 	this.objects = objects;
 }
 
-Graphic.prototype.setTransformation = function(transformation) {
-	this.transformation = transformation;
+Graphic.prototype.setTransformations = function(transformations) {
+	this.transformations = transformations;
+};
+
+Graphic.prototype.addTransformation = function(transformation) {
+	this.transformations.push(transformation);
 };
 
 Graphic.prototype.setObjects = function(objects) {
@@ -20,9 +24,11 @@ Graphic.prototype.addObject = function(object) {
 Graphic.prototype.render = function(layer) {
 	var context = layer.getContext("2d");
 	context.save();
-	//TODO: transformation
+	this.transformations.forEach(function (transformation) {
+		transformation.apply(context);
+	});
 	this.objects.forEach(function (object) {
 		object.render(context);
 	});
-	context.restore(); 
+	context.restore();
 };
